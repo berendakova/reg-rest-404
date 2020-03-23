@@ -1,0 +1,226 @@
+
+
+
+
+
+
+
+
+
+
+
+    @RequestMapping
+    public String index(ModelMap map) {
+        map.put("viewVariable", "Index action");
+        return "tests";
+    }
+
+    @RequestMapping("/s")
+    public String simple(ModelMap map) {
+        map.put("viewVariable", "Just simple action");
+        return "tests";
+    }
+
+    @RequestMapping({"/s1", "/s2"})
+    public String simpleMultiple(ModelMap map) {
+        map.put("viewVariable", "Just simple action for 2 addresses");
+        return "tests";
+    }
+
+    @RequestMapping("/rb")
+    @ResponseBody
+    public String responseBody() {
+        return "The only text on a page is this text - @ResponseBody annotation.";
+    }
+
+    @RequestMapping("/writer")
+    public void writer(java.io.Writer writer) throws IOException {
+        writer.write("This is plain/text done with java.io.Writer");
+    }
+
+    @RequestMapping("/rs")
+    @ResponseStatus(HttpStatus.I_AM_A_TEAPOT)
+    public String responseStatus(ModelMap map) {
+        map.put("viewVariable", "What do you want from me? I'm a teapot!");
+        return "tests";
+    }
+
+    @RequestMapping(
+            value = "/rmb",
+            method = RequestMethod.GET,
+            headers = "!user-agent=Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0) Gecko/20100101 Firefox/36.0",
+            params = "secret_param=1"
+    )
+    public String requestMappingBunch(ModelMap map) {
+        map.put("viewVariable", "Page with secret_param for not Mozilla 36 on Linux");
+        return "tests";
+    }
+
+    @RequestMapping("/rp")
+    public String requestParam(@RequestParam String param, ModelMap map) {
+        map.put("viewVariable", "Request parameter:<br>" + param);
+        return "tests";
+    }
+
+    @RequestMapping("/rpb")
+    public String requestParamBanch(
+            @RequestParam(
+                    value = "special_name",
+                    required = false,
+                    defaultValue = "Default value"
+            ) String param,
+            ModelMap map
+    ) {
+        map.put("viewVariable", "Request parameter:<br>" + param);
+        return "tests";
+    }
+
+    @RequestMapping("/pv/{param}")
+    public String pathVariable(@PathVariable String param, ModelMap map) {
+        map.put("viewVariable", "Path variable:<br>" + param);
+        return "tests";
+    }
+
+    @RequestMapping("/pvb/{param_special_name}/{param2}/path")
+    public String pathVariableBunch(
+            @PathVariable(
+                    value = "param_special_name"
+            ) String param,
+            @PathVariable String param2,
+            ModelMap map
+    ) {
+        map.put("viewVariable", "Path variable:<br>" + param);
+        return "tests";
+    }
+
+    @RequestMapping("/rh")
+    public String requestHeader(
+            @RequestHeader("user-agent") String userAgent,
+            @RequestHeader("accept") String accept,
+            @RequestHeader("Host") String host,
+            @RequestHeader("Accept-Encoding") String acceptEncoding,
+            @RequestHeader("Accept-Language") String acceptLanguage,
+            @RequestHeader("Connection") String connection,
+            @RequestHeader("Cookie") String cookie,
+            @RequestHeader("Referer") String referer,
+            ModelMap map) {
+        map.put("viewVariable",
+                "<b>User-agent header:</b><br>" + userAgent +
+                        "<br><b>Accept header :</b> <br>" + accept +
+                        "<br><b>Host header : </b><br>" + host +
+                        "<br><b>Accept-Encoding header :</b> <br>" + acceptEncoding +
+                        "<br><b>Accept-Language header :</b> <br>" + acceptLanguage +
+                        "<br><b>Connection header :</b> <br>" + connection +
+                        "<br><b>Cookie header : </b><br>" + cookie +
+                        "<br><b>Refer header : </b><br>" + referer);
+        return "tests";
+    }
+
+
+    @RequestMapping("/headers")
+    public String headers(@RequestHeader("HttpHeaders") Map<String, String> headers, ModelMap map) {
+        map.put("viewVariable", "Http headers:<br>" + headers);
+        return "tests";
+    }
+
+
+    @RequestMapping("/calculator")
+    public String reuestCalculator(@RequestParam String operant1, @RequestParam String operator, @RequestParam String operant2, ModelMap map) {
+        if (!((operator.equals("*")) || (operator.equals("/")) || (operator.equals("+")) || (operator.equals("-")))) {
+
+            map.put("viewVariable", "Not correct operator" + "  " + operator);
+        }
+        if (!(isNumeric(operant1) || isNumeric(operant2))) {
+            map.put("viewVariable", "operator must be numeric");
+        } else {
+            double operant1_ = Double.parseDouble(operant1);
+            double operant2_ = Double.parseDouble(operant2);
+
+            if (operator.equals("-")) {
+                map.put("viewVariable", operant1_ - operant2_);
+            }
+            if (operator.equals("+")) {
+                map.put("viewVariable", operant1_ + operant2_);
+            }
+            if (operator.equals("*")) {
+                map.put("viewVariable", operant1_ * operant2_);
+            }
+            if ((operator.equals("/") && (operant2_ == 0))) {
+                map.put("viewVariable", "you cant / on 0");
+            }
+            if ((operator.equals("/") && (operant2_ != 0))) {
+                map.put("viewVariable", operant1_ / operant2_);
+            }
+
+        }
+        return "tests";
+    }
+
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    @RequestMapping(
+            value = "/rmb",
+            method = RequestMethod.GET,
+            headers = "!Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36",
+            params = "secret_param=1"
+    )
+    public String requestMappingBunchExp(ModelMap map) {
+        map.put("viewVariable", "Page with secret_param for not Mozilla 36 on Linux");
+        return "tests";
+    }
+
+
+    @RequestMapping(value = "/calculator_new", method = RequestMethod.POST)
+    public String reqCalculatorNew(
+            @RequestParam String operant1,
+            @RequestParam String operator,
+            @RequestParam String operant2,
+            ModelMap map) {
+        String operant1_ = operant1.replaceAll(",", "");
+        String operant2_ = operant2.replaceAll(",", "");
+
+        int num1 = Integer.parseInt(operant1_);
+        int num2 = Integer.parseInt(operant2_);
+
+        String operand = operator.replaceAll(",", "");
+        System.out.println(operand);
+
+        if (!((operand.equals("*")) || (operand.equals("/")) || (operand.equals("+")) || (operand.equals("-")))) {
+
+            map.put("answer", "Not correct operator" + "  " + operator);
+        }
+
+        if (operand.equals("-")) {
+            map.put("answer", num1 - num2);
+        }
+        if (operand.equals("+")) {
+            map.put("answer", num1 + num2);
+        }
+        if (operand.equals("*")) {
+            map.put("answer", num1 * num2);
+        }
+        if ((operand.equals("/") && (num2 == 0))) {
+            map.put("answer", "you cant / on 0");
+        }
+        if ((operand.equals("/") && (num2 != 0))) {
+            map.put("answer", num1 / num2);
+        }
+
+
+        return "redirect: calculator_new";
+    }
+
+    @RequestMapping(value = "/calculator_new", method = RequestMethod.GET)
+    public String calculatorNew(@RequestParam(
+            required = false,
+            name = "answer") String answer, ModelMap map) {
+        map.put("answer", answer);
+        return "calculator";
+    }
